@@ -29,23 +29,12 @@ namespace Bank.Transfers.Models
             return $"Saldo atual da conta de {Nome} é {Saldo}";
         }
 
-        /*
-public void Transferir(double valorTransferencia, Conta contaDestino)
-{
-    if (Sacar(valorTransferencia))
-        contaDestino.Depositar(valorTransferencia);
-}
+        public void Transferir(double valorTransferencia, Conta contaDestino)
+        {
+            var (operacao, _) = Sacar(valorTransferencia);
 
-public override string ToString()
-{
-    string retorno = "";
-    retorno += "TipoConta " + TipoConta + " | ";
-    retorno += "Nome " + Nome + " | ";
-    retorno += "Saldo " + Saldo + " | ";
-    retorno += "Crédito " + Credito;
-
-    return retorno;
-}
-*/
+            if (operacao)
+                contaDestino.Depositar(valorTransferencia);
+        }
     }
 }

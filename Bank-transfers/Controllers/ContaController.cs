@@ -2,6 +2,7 @@
 using Bank.Transfers.Models;
 using Bank.Transfers.ViewModel;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
@@ -114,11 +115,11 @@ namespace Bank.Transfers.Controllers
         //    return View(conta);
         //}
 
-        public async Task<ViewResult> Mensagem(string mensagem)
+        public ViewResult Mensagem(string mensagem)
             => View(new MensagemViewModel { Mensagem = mensagem });
 
 
-        public async Task<ViewResult> Sacar(int id)
+        public ViewResult Sacar(int id)
             => View(new SacarViewModel { IdConta = id });
 
         [HttpPost]
@@ -148,7 +149,7 @@ namespace Bank.Transfers.Controllers
         }
 
 
-        public async Task<ViewResult> Depositar(int id)
+        public ViewResult Depositar(int id)
             => View(new DepositarViewModel { IdConta = id });
 
         [HttpPost]
@@ -167,6 +168,48 @@ namespace Bank.Transfers.Controllers
                 await _context.SaveChangesAsync();
 
                 return RedirectToAction(actionName: "Mensagem", routeValues: new { mensagem });
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw;
+            }
+        }
+
+        public async Task<ViewResult> Transferir(int id)
+        {
+            var contas = await _context.Conta.ToListAsync();
+
+            var model = new TransferirViewModel 
+            { 
+                Contas = new SelectList
+                    (
+                        contas.Where(c => c.Id != id),
+                        "Id",
+                        "Nome"
+                    ),
+                ContaOrigemId = id
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Transferir(int id, [Bind("ContaDestino,ValorTransferencia")] TransferirViewModel model)
+        {
+            try
+            {
+                var contaOrigem = await _context.Conta.FindAsync(id);
+                var contaDestino = await _context.Conta.FindAsync(model.ContaDestinoId);
+
+                contaOrigem.Transferir(model.ValorTransferencia, contaDestino);
+
+                _context.Update(contaOrigem);
+                _context.Update(contaDestino);
+
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction(nameof(Index));
             }
             catch (DbUpdateConcurrencyException)
             {

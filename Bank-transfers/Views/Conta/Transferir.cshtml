@@ -1,0 +1,40 @@
+﻿@model Bank.Transfers.ViewModel.TransferirViewModel
+@{
+    ViewData["Title"] = "Transferir";
+}
+
+<h1>Transferir</h1>
+
+<h4>Conta</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Transferir">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="ContaOrigemId" />
+            <div class="form-group">
+                <label class="control-label">Conta destino</label>
+                <select asp-for="ContaDestinoId" asp-items="Model.Contas" class="form-control">
+                    <option value="">Selecione</option>
+                </select>
+                <span asp-validation-for="ContaDestinoId" class="text-danger"></span>
+            </div>
+            @Html.DropDownListFor(f => f.ContaDestinoId, Model.Contas, new { @class = "form-control" })
+            <div class="form-group">
+                <label class="control-label">Valor transferência</label>
+                <input asp-for="ValorTransferencia" class="form-control" />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Transferir" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Voltar</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
