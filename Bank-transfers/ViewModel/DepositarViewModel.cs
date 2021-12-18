@@ -1,8 +1,8 @@
 ﻿namespace Bank.Transfers.ViewModel
 {
-    public class SacarViewModel
+    public class DepositarViewModel
     {
         public int IdConta { get; set; }
-        public double ValorSaque { get; set; }
+        public double ValorDeposito { get; set; }
     }
 }

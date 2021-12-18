@@ -116,13 +116,10 @@ namespace Bank.Transfers.Controllers
 
         public async Task<ViewResult> Mensagem(string mensagem)
             => View(new MensagemViewModel { Mensagem = mensagem });
-        
-        // GET: Conta/Sacar/5
+
+
         public async Task<ViewResult> Sacar(int id)
-        {
-            var sacar = new SacarViewModel { IdConta = id };
-            return View(sacar);
-        }
+            => View(new SacarViewModel { IdConta = id });
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -142,7 +139,34 @@ namespace Bank.Transfers.Controllers
                     await _context.SaveChangesAsync();
                 }
 
-                return RedirectToAction(actionName:"Mensagem", routeValues: new { mensagem } );
+                return RedirectToAction(actionName: "Mensagem", routeValues: new { mensagem });
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<ViewResult> Depositar(int id)
+            => View(new DepositarViewModel { IdConta = id });
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Depositar(int id, [Bind("IdConta,ValorDeposito")] DepositarViewModel model)
+        {
+            if (id != model.IdConta)
+                return NotFound();
+
+            try
+            {
+                var conta = await _context.Conta.FindAsync(id);
+                string mensagem = conta.Depositar(model.ValorDeposito);
+
+                _context.Update(conta);
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction(actionName: "Mensagem", routeValues: new { mensagem });
             }
             catch (DbUpdateConcurrencyException)
             {

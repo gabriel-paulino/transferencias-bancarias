@@ -23,14 +23,13 @@ namespace Bank.Transfers.Models
             return (true, $"Saldo atual da conta de {Nome} é {Saldo}");
         }
 
+        public string Depositar(double valorDeposito)
+        {
+            Saldo += valorDeposito;
+            return $"Saldo atual da conta de {Nome} é {Saldo}";
+        }
+
         /*
-public void Depositar(double valorDeposito)
-{
-    Saldo += valorDeposito;
-
-    Console.WriteLine("Saldo atual da conta de {0} é {1}", Nome, Saldo);
-}
-
 public void Transferir(double valorTransferencia, Conta contaDestino)
 {
     if (Sacar(valorTransferencia))
