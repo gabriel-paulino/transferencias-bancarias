@@ -19,7 +19,6 @@
                 </select>
                 <span asp-validation-for="ContaDestinoId" class="text-danger"></span>
             </div>
-            @Html.DropDownListFor(f => f.ContaDestinoId, Model.Contas, new { @class = "form-control" })
             <div class="form-group">
                 <label class="control-label">Valor transferência</label>
                 <input asp-for="ValorTransferencia" class="form-control" />

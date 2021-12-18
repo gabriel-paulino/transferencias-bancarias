@@ -18,39 +18,24 @@ namespace Bank.Transfers.Controllers
             _context = context;
         }
 
-        // GET: Conta
-        public async Task<IActionResult> Index()
-        {
-            return View(await _context.Conta.ToListAsync());
-        }
+        public async Task<ViewResult> Index()
+            =>  View(await _context.Conta.ToListAsync());
 
-        // GET: Conta/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
+            
+            var conta = await _context.Conta.FirstOrDefaultAsync(m => m.Id == id);
 
-            var conta = await _context.Conta
-                .FirstOrDefaultAsync(m => m.Id == id);
             if (conta == null)
-            {
                 return NotFound();
-            }
-
+            
             return View(conta);
         }
 
-        // GET: Conta/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
+        public ViewResult Create() => View();
 
-        // POST: Conta/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,TipoConta,Saldo,Credito,Nome")] Conta conta)
@@ -64,60 +49,8 @@ namespace Bank.Transfers.Controllers
             return View(conta);
         }
 
-        // GET: Conta/Edit/5
-        //public async Task<IActionResult> Edit(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var conta = await _context.Conta.FindAsync(id);
-        //    if (conta == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return View(conta);
-        //}
-
-        // POST: Conta/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Edit(int id, [Bind("Id,TipoConta,Saldo,Credito,Nome")] Conta conta)
-        //{
-        //    if (id != conta.Id)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    if (ModelState.IsValid)
-        //    {
-        //        try
-        //        {
-        //            _context.Update(conta);
-        //            await _context.SaveChangesAsync();
-        //        }
-        //        catch (DbUpdateConcurrencyException)
-        //        {
-        //            if (!ContaExists(conta.Id))
-        //            {
-        //                return NotFound();
-        //            }
-        //            else
-        //            {
-        //                throw;
-        //            }
-        //        }
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    return View(conta);
-        //}
-
         public ViewResult Mensagem(string mensagem)
             => View(new MensagemViewModel { Mensagem = mensagem });
-
 
         public ViewResult Sacar(int id)
             => View(new SacarViewModel { IdConta = id });
@@ -147,7 +80,6 @@ namespace Bank.Transfers.Controllers
                 throw;
             }
         }
-
 
         public ViewResult Depositar(int id)
             => View(new DepositarViewModel { IdConta = id });
@@ -195,7 +127,7 @@ namespace Bank.Transfers.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Transferir(int id, [Bind("ContaDestino,ValorTransferencia")] TransferirViewModel model)
+        public async Task<IActionResult> Transferir(int id, [Bind("ContaDestinoId,ValorTransferencia")] TransferirViewModel model)
         {
             try
             {
@@ -215,40 +147,6 @@ namespace Bank.Transfers.Controllers
             {
                 throw;
             }
-        }
-
-        // GET: Conta/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var conta = await _context.Conta
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (conta == null)
-            {
-                return NotFound();
-            }
-
-            return View(conta);
-        }
-
-        // POST: Conta/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var conta = await _context.Conta.FindAsync(id);
-            _context.Conta.Remove(conta);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool ContaExists(int id)
-        {
-            return _context.Conta.Any(e => e.Id == id);
         }
     }
 }
