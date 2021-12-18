@@ -1,4 +1,5 @@
 ﻿using Bank.Transfers.Enum;
+using System;
 
 namespace Bank.Transfers.Models
 {
@@ -12,22 +13,17 @@ namespace Bank.Transfers.Models
 
         public Conta() { }
 
+        public (bool operacao, string mensagem) Sacar(double valorSaque)
+        {
+            if (Saldo - valorSaque < (Credito * -1))
+                return (false, "Saldo insuficiente!");
+
+            Saldo -= valorSaque;
+
+            return (true, $"Saldo atual da conta de {Nome} é {Saldo}");
+        }
+
         /*
-public bool Sacar(double valorSaque)
-{
-    if (Saldo - valorSaque < (Credito * -1))
-    {
-        Console.WriteLine("Saldo insuficiente!");
-        return false;
-    }
-
-    Saldo -= valorSaque;
-
-    Console.WriteLine("Saldo atual da conta de {0} é {1}", Nome, Saldo);
-
-    return true;
-}
-
 public void Depositar(double valorDeposito)
 {
     Saldo += valorDeposito;

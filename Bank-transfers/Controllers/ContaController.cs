@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Bank.Transfers.Data;
+using Bank.Transfers.Models;
+using Bank.Transfers.ViewModel;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using Bank.Transfers.Data;
-using Bank.Transfers.Models;
 
 namespace Bank.Transfers.Controllers
 {
@@ -66,54 +64,90 @@ namespace Bank.Transfers.Controllers
         }
 
         // GET: Conta/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+        //public async Task<IActionResult> Edit(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            var conta = await _context.Conta.FindAsync(id);
-            if (conta == null)
-            {
-                return NotFound();
-            }
-            return View(conta);
-        }
+        //    var conta = await _context.Conta.FindAsync(id);
+        //    if (conta == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return View(conta);
+        //}
 
         // POST: Conta/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> Edit(int id, [Bind("Id,TipoConta,Saldo,Credito,Nome")] Conta conta)
+        //{
+        //    if (id != conta.Id)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    if (ModelState.IsValid)
+        //    {
+        //        try
+        //        {
+        //            _context.Update(conta);
+        //            await _context.SaveChangesAsync();
+        //        }
+        //        catch (DbUpdateConcurrencyException)
+        //        {
+        //            if (!ContaExists(conta.Id))
+        //            {
+        //                return NotFound();
+        //            }
+        //            else
+        //            {
+        //                throw;
+        //            }
+        //        }
+        //        return RedirectToAction(nameof(Index));
+        //    }
+        //    return View(conta);
+        //}
+
+        public async Task<ViewResult> Mensagem(string mensagem)
+            => View(new MensagemViewModel { Mensagem = mensagem });
+        
+        // GET: Conta/Sacar/5
+        public async Task<ViewResult> Sacar(int id)
+        {
+            var sacar = new SacarViewModel { IdConta = id };
+            return View(sacar);
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,TipoConta,Saldo,Credito,Nome")] Conta conta)
+        public async Task<IActionResult> Sacar(int id, [Bind("IdConta,ValorSaque")] SacarViewModel model)
         {
-            if (id != conta.Id)
-            {
+            if (id != model.IdConta)
                 return NotFound();
-            }
 
-            if (ModelState.IsValid)
+            try
             {
-                try
+                var conta = await _context.Conta.FindAsync(id);
+                var (operacao, mensagem) = conta.Sacar(model.ValorSaque);
+
+                if (operacao)
                 {
                     _context.Update(conta);
                     await _context.SaveChangesAsync();
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ContaExists(conta.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+
+                return RedirectToAction(actionName:"Mensagem", routeValues: new { mensagem } );
             }
-            return View(conta);
+            catch (DbUpdateConcurrencyException)
+            {
+                throw;
+            }
         }
 
         // GET: Conta/Delete/5
